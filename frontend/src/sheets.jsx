@@ -11,7 +11,7 @@ import { starterRoutines } from './lib/starter.js'
 import Media, { Thumb } from './components/Media.jsx'
 import Stepper from './components/Stepper.jsx'
 import Icon from './components/Icon.jsx'
-import { Button, Slider, Switch, Segmented, SelectRow, TextArea, NumberField } from './components/ui.jsx'
+import { Button, Slider, Switch, Segmented, SelectRow, TextArea, NumberField, Row } from './components/ui.jsx'
 import { glyphOf, GLYPH_GROUPS, DEFAULT_GLYPH } from './lib/glyphs.js'
 import BodyMap from './components/BodyMap.jsx'
 import { loadOfWorkouts } from './lib/muscles.js'
@@ -20,6 +20,7 @@ import { buildPlanBundle, parsePlan, mergePlan, printPlan } from './lib/plan-sha
 import { estimate1RM, best1RM, is1RMRecord, REP_CAP } from './lib/onerm.js'
 import { nextPrescription, applyPrescription, policyFor, defaultIncrement, POLICIES_FOR, POLICY_NAME, POLICY_DESC } from './lib/progression.js'
 import { TESTS, PRIMARY_KIND, estimateVO2 } from './lib/cardio.js'
+import { candidates, repFor } from './lib/strength.js'
 import { MOBILE, shareExport } from './lib/mobile.js'
 
 const S = () => useStore.getState().S
@@ -1000,3 +1001,32 @@ function FieldTest({ close }) {
   </>
 }
 export const fieldTestSheet = () => ui().openSheet(close => <FieldTest close={close} />)
+
+/* ======================== strength representative ======================== */
+// Which lift speaks for a body area on the Progress screen.
+//
+// The default is derived from history — the exercise you train most often, among the ones
+// that can produce an estimate — and then pinned, so the headline never swaps to a
+// different lift on its own. This is the way to move it deliberately. Deliberately not a
+// settings page: the choice only makes sense next to the row it changes, and the list is
+// only ever the handful of exercises you have actually trained in that area.
+function StrengthRep({ bp, close }) {
+  const st = useStore(s => s.S)
+  const list = candidates(st, bp)
+  const cur = (repFor(st, bp) || {}).id
+  return <>
+    <h3 className="capitalize">{t(bp)}</h3>
+    <div className="muted small" style={{ marginBottom: 12, lineHeight: 1.5 }}>
+      {t('Only exercises that can produce an estimate are listed — a set above {0} reps, or one with no load to measure, cannot.', REP_CAP)}
+    </div>
+    {list.map(c => <Row key={c.id} title={<span className="capitalize">{c.name}</span>}
+      subtitle={t(c.days === 1 ? 'trained on {0} day' : 'trained on {0} days', c.days)}
+      accessory={c.id === cur ? 'check' : 'none'}
+      onClick={() => {
+        update(s => { s.strengthReps = { ...(s.strengthReps || {}), [bp]: c.id } })
+        close()
+        toast(t('{0} now represents {1}', c.name, t(bp)))
+      }} />)}
+  </>
+}
+export const strengthRepSheet = bp => ui().openSheet(close => <StrengthRep bp={bp} close={close} />)

@@ -31,6 +31,7 @@ describe('Progress view module graph', () => {
     const sheets = await import('../sheets.jsx')
     expect(typeof view.default).toBe('function')
     expect(typeof sheets.fieldTestSheet).toBe('function')
+    expect(typeof sheets.strengthRepSheet).toBe('function')
   })
 
   it('exposes every name the view destructures at module scope', async () => {

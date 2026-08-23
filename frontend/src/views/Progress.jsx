@@ -5,7 +5,7 @@ import { fmtNum, fmtDate } from '../lib/format.js'
 import { thisWeek, lastNWeeks } from '../lib/consistency.js'
 import { areaProgress, missingReps } from '../lib/strength.js'
 import { latestPair, primaryKind, daysSince } from '../lib/cardio.js'
-import { fieldTestSheet } from '../sheets.jsx'
+import { fieldTestSheet, strengthRepSheet } from '../sheets.jsx'
 import { Button } from '../components/ui.jsx'
 import { nav } from '../lib/nav.js'
 
@@ -85,7 +85,9 @@ function Strength({ S }) {
       t('Nothing to compare yet.'),
       t('Log a few sessions and the lift you train most in each area appears here.')
     ]} />}
-    {rows.map(r => <div key={r.bp} style={{ padding: '9px 0', borderBottom: 'var(--hair) solid var(--sep)' }}>
+    {/* Tapping a row changes which lift speaks for that area. The default is derived and
+        then pinned, so this is the only thing that moves it. */}
+    {rows.map(r => <button key={r.bp} className="prow" onClick={() => strengthRepSheet(r.bp)} aria-label={t('Change which exercise represents {0}', t(r.bp))}>
       <div className="row between" style={{ alignItems: 'baseline', gap: 10 }}>
         {/* The area is a grouping header; the exercise name carries the truth claim.
             Always rendered, so if the representative ever changes it is visible. */}
@@ -102,7 +104,7 @@ function Strength({ S }) {
         </span>
         {r.baselineDate && <Delta value={r.delta} unit={S.unit} improved={r.delta > 0} />}
       </div>
-    </div>)}
+    </button>)}
     {rows.length > 0 && <div className="small dim" style={{ marginTop: 10, lineHeight: 1.45 }}>
       {t('Estimated from your top set. Pull-ups, dips and push-ups count your bodyweight, so their numbers move when your weight does.')}
     </div>}
