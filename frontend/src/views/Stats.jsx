@@ -196,6 +196,7 @@ export default function Stats() {
 
   return <>
     <div className="hdr"><div><h1>{t('Stats')}</h1><div className="sub">{t('Progress & history')}</div></div>
+      <button className="iconbtn" onClick={() => nav('/progress')} aria-label={t('Progress')}><Icon name="medal" /></button>
       <button className="iconbtn" onClick={() => nav('/history')} aria-label={t('History')}><Icon name="history" /></button></div>
 
     <div className="tiles">

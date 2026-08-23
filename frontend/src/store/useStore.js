@@ -19,7 +19,20 @@ export const DEF = {
   // AI Coach (issue: AI enablement). null until the profile opts in — a null namespace is the
   // same app it was before the feature existed, which is what Epic F asks for. Shape and
   // bounds live in lib/coach.js.
-  coach: null
+  coach: null,
+  // Progress screen. Both are top level rather than nested under one key, because loaded
+  // state is overlaid with a *shallow* Object.assign on every path (local, server pull,
+  // backup import) — a nested namespace would be replaced wholesale by an older backup's
+  // copy instead of merged. Neither needs a migration: an old backup arrives without them
+  // and gets these defaults.
+  //
+  // cardioTests: [{ d, kind, values, vo2 }] — field-test results. `vo2` is nullable; the
+  // raw values are the record. See lib/cardio.js.
+  cardioTests: [],
+  // strengthReps: bp -> exercise id. Which lift represents each body area on the Progress
+  // screen, derived from history the first time and then kept, so the headline never
+  // silently swaps to a different exercise. See lib/strength.js.
+  strengthReps: {}
 }
 const clone = o => JSON.parse(JSON.stringify(o))
 

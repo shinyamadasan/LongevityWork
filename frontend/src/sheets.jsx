@@ -11,7 +11,7 @@ import { starterRoutines } from './lib/starter.js'
 import Media, { Thumb } from './components/Media.jsx'
 import Stepper from './components/Stepper.jsx'
 import Icon from './components/Icon.jsx'
-import { Button, Slider, Switch, Segmented, SelectRow, TextArea } from './components/ui.jsx'
+import { Button, Slider, Switch, Segmented, SelectRow, TextArea, NumberField } from './components/ui.jsx'
 import { glyphOf, GLYPH_GROUPS, DEFAULT_GLYPH } from './lib/glyphs.js'
 import BodyMap from './components/BodyMap.jsx'
 import { loadOfWorkouts } from './lib/muscles.js'
@@ -19,6 +19,7 @@ import { parseImport, mergeImport } from './lib/import-csv.js'
 import { buildPlanBundle, parsePlan, mergePlan, printPlan } from './lib/plan-share.js'
 import { estimate1RM, best1RM, is1RMRecord, REP_CAP } from './lib/onerm.js'
 import { nextPrescription, applyPrescription, policyFor, defaultIncrement, POLICIES_FOR, POLICY_NAME, POLICY_DESC } from './lib/progression.js'
+import { TESTS, PRIMARY_KIND, estimateVO2 } from './lib/cardio.js'
 import { MOBILE, shareExport } from './lib/mobile.js'
 
 const S = () => useStore.getState().S
@@ -947,3 +948,55 @@ function doFinishWorkout() {
   beep(snd(), 880, 0.15); beep(snd(), 1100, 0.15, 0.18); beep(snd(), 1320, 0.3, 0.36)
   ui().openSheet(close => <FinishSummary w={w} prs={prs} e1prs={e1prs} close={close} />, { kind: 'center', locked: true })
 }
+
+/* ============================ cardio field test ============================ */
+// The catalogue in lib/cardio.js owns the formulas, the bounds and the instructions; this
+// sheet collects one number and shows what it comes to. Adding a fourth test there needs
+// no change here.
+//
+// The raw result is what gets saved, always. An earlier version of this sheet disabled its
+// own save button until the VO2max formula was willing to produce an estimate, which meant
+// a 350 m twelve-minute run — a real distance a real person covered — could not be
+// recorded at all. The estimate is secondary and shown only when it exists.
+function FieldTest({ close }) {
+  const st = S()
+  const [kind, setKind] = useState(PRIMARY_KIND)
+  const [v, setV] = useState(null)
+  const test = TESTS[kind]
+  const n = Number(v)
+  const ok = Number.isFinite(n) && n > 0
+  const vo2 = ok ? estimateVO2(kind, { [test.field]: n }, { body: st.body }) : null
+
+  return <>
+    <h3>{t('Log a fitness test')}</h3>
+    <SelectRow title={t('Test')} sheetTitle={t('Log a fitness test')} value={kind}
+      onChange={k => { setKind(k); setV(null) }}
+      options={Object.keys(TESTS).map(k => ({ value: k, label: t(TESTS[k].name) }))} />
+    <div className="muted small" style={{ margin: '10px 2px 14px', lineHeight: 1.5 }}>{t(test.how)}</div>
+
+    <div className="row between" style={{ alignItems: 'center' }}>
+      <span>{t(test.field === 'metres' ? 'Distance (m)' : test.field === 'minutes' ? 'Time (min)' : 'Heart rate (bpm)')}</span>
+      <NumberField value={v} onChange={setV} nullable decimal={test.decimal} style={{ width: 110 }} />
+    </div>
+
+    <div style={{ height: 14 }} />
+    {ok && <div className="card" style={{ margin: 0, textAlign: 'center' }}>
+      <div className="big">{fmtNum(n)} <span className="dim" style={{ fontSize: 17, fontWeight: 400 }}>{test.unit}</span></div>
+      <div className="small dim" style={{ marginTop: 4 }}>{t(test.name)}</div>
+      {vo2
+        ? <div className="small dim" style={{ marginTop: 8 }}>{t('Estimated VO₂max {0}', vo2)}</div>
+        : <div className="small dim" style={{ marginTop: 8 }}>{t('Outside the range the VO₂max estimate covers — the result is still logged.')}</div>}
+    </div>}
+    {!ok && <div className="muted small" style={{ textAlign: 'center' }}>{t('Enter your result to log it.')}</div>}
+
+    <div style={{ height: 14 }} />
+    <Button variant="primary" disabled={!ok} onClick={() => {
+      update(s => {
+        s.cardioTests = [...(s.cardioTests || []), { d: todayISO(), kind, values: { [test.field]: n }, vo2 }]
+      })
+      close()
+      toast(t('Test logged: {0} {1}', fmtNum(n), test.unit))
+    }}>{t('Save result')}</Button>
+  </>
+}
+export const fieldTestSheet = () => ui().openSheet(close => <FieldTest close={close} />)

@@ -13,7 +13,9 @@ export default function TabBar({ onStart }) {
   const isGuest = useStore(s => s.isGuest())
   if (!user && !isGuest) return null
   const cur = loc.pathname.split('/')[1] || 'home'
-  const on = k => cur === k || (cur === 'history' && k === 'stats') || (cur === 'settings' && k === 'home')
+  // History and Progress are both reached from Stats and have no tab of their own, so they
+  // light Stats rather than leaving the bar with nothing selected.
+  const on = k => cur === k || ((cur === 'history' || cur === 'progress') && k === 'stats') || (cur === 'settings' && k === 'home')
 
   const startWorkout = () => {
     if (!S.active) {
