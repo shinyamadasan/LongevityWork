@@ -1,14 +1,14 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="openGym" width="720">
+<img src="assets/banner.png" alt="openGym Longevity" width="720">
 
 <br>
 
-**A self-hosted gym & body-weight tracker you actually own.**
+# openGym Longevity
 
-Plan your week, run guided workouts, track every set and your body weight over time —
-on your phone, synced across devices, behind your own passkey login.
-No account on someone else's server, no subscription, no ads. Just `docker compose up`.
+**A self-hosted strength and cardio tracker focused on long-term progress.**
+
+Built on openGym, originally created by the openGym contributors.
 
 <br>
 
@@ -18,28 +18,32 @@ No account on someone else's server, no subscription, no ads. Just `docker compo
 ![React](https://img.shields.io/badge/React-19-38bdf8?style=flat-square&logo=react&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![No tracking](https://img.shields.io/badge/telemetry-none-f472b6?style=flat-square)
-<br>
-![GitHub last commit](https://img.shields.io/github/last-commit/DuarteSantos8/openGym?style=flat-square)
-[![GitHub stars](https://img.shields.io/github/stars/DuarteSantos8/openGym?style=flat-square)](https://github.com/DuarteSantos8/openGym/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/DuarteSantos8/openGym?style=flat-square)](https://github.com/DuarteSantos8/openGym/issues)
 
 </div>
 
 <br>
 
-> ### 🤖 This is a fork — it adds the AI Coach
->
-> A fork of [DuarteSantos8/openGym](https://github.com/DuarteSantos8/openGym) that adds one
-> optional feature: an AI that **designs** your training plan and **revises it from what you
-> actually log**, running on your own server under your own provider account.
->
-> Everything else is upstream openGym. With the Coach switched off, this is byte-for-byte the
-> app it forked from.
->
-> **→ [What it does and how to use it](docs/AI_COACH.md)** ·
-> [Claude setup](Claude-setup-instructions.md) ·
-> [ChatGPT / Codex setup](ChatGPT-setup-instructions.md) ·
-> [design deck (PDF)](openGym_AI_Strategy.pdf)
+## What this version focuses on
+
+openGym Longevity is designed around three questions:
+
+1. **Am I training consistently?**
+2. **Am I getting stronger?**
+3. **Is my cardio improving?**
+
+It adds a Progress experience centered on:
+
+- rolling training consistency
+- strength trends against your own previous performance
+- stable representative lifts
+- Cooper 12-minute cardio testing
+- multi-user profiles and cross-device sync
+
+Everything else is upstream openGym: the weekly plan, guided workouts, the progression
+engine, the exercise library, passkey sign-in and the optional AI Coach are all unchanged.
+
+This project is derived from [openGym](https://github.com/DuarteSantos8/openGym) and remains
+licensed under AGPL-3.0.
 
 <br>
 
@@ -53,25 +57,17 @@ No account on someone else's server, no subscription, no ads. Just `docker compo
 </table>
 </div>
 
-<div align="center">
-
-### [🌐 opengym.duarte-santos.ch](https://opengym.duarte-santos.ch) · [▶ Try the live demo](https://duartesantos8.github.io/openGym/)
-
-No signup, nothing to install — it runs entirely in your browser on example data.<br>
-<sub>There's no server behind the demo, so passkey sign-in, sync across devices and the
-admin dashboard only exist in a self-hosted instance.</sub>
-
-</div>
-
 ## Why
 
 Most workout apps lock your data behind a login on their servers, nag you to upgrade, or
-disappear when the startup does. openGym is the opposite: **it runs on your box, your data
-stays in a folder you control, and it's yours to fork.** It still feels modern — installable
-as a home-screen app, passkey sign-in, offline support, sync across your phone and laptop.
+disappear when the startup does. openGym Longevity is the opposite: **it runs on your box,
+your data stays in a folder you control, and it's yours to fork.** It still feels modern —
+installable as a home-screen app, passkey sign-in, offline support, sync across your phone
+and laptop.
 
 ## Features
 
+- 📊 **Progress — consistency, strength & cardio** — the screen this version exists for. Training days this week against what you planned, and an 8-week rate that editing your plan can't rewrite. One representative lift per body area, compared against your own best from about three months ago — it can go **down**, which is the point. Cooper 12-minute run distance against your previous test. Every number is you-versus-you: no population bands, no percentiles, no score.
 - ⚖️ **Body-weight tracking** — interactive chart with a goal line you set, gains/losses colored by whether they move toward it
 - 🏋️ **Weekly plan** — a routine per weekday, over a library of **1,324 exercises** (searchable, with animated demos)
 - 🗓️ **Reschedule any day** — sick, missed a session, or fewer gym days this week? Move a workout to another day without touching your weekly plan
@@ -96,15 +92,15 @@ as a home-screen app, passkey sign-in, offline support, sync across your phone a
 - 🌍 **12 languages** — full UI translation (EN, DE, ES, FR, IT, PT, PL, TR, RU, ZH, KO, HI); exercise instructions localized in 10 of them, loaded on demand so the app stays fast
 - 📥 **Bring your history with you** — import from **FitNotes** (Android and iOS), **Strong** and **Hevy**, or body weight straight out of an **Apple Health** export. Exercise names are matched against the library and anything unrecognised becomes one of your own exercises, so nothing in the file is dropped
 - 📦 **Yours to keep** — one-tap JSON export/import, guest mode, **no telemetry**
-- 📱 **Standalone Android app** — the whole tracker as a sideloadable APK: no account, no server, data on the phone, native workout reminders ([download](https://opengym.duarte-santos.ch))
+- 📱 **Standalone Android app** — the same codebase also builds a sideloadable APK (Capacitor): no account, no server, data on the phone, native workout reminders. You build it from this repo — **[docs/MOBILE.md](docs/MOBILE.md)**
 
 ## Quick start (self-host)
 
 You need [Docker](https://docs.docker.com/get-docker/) with Compose.
 
 ```bash
-git clone https://github.com/DuarteSantos8/openGym
-cd openGym
+git clone https://github.com/shinyamadasan/LongevityWork
+cd LongevityWork
 cp .env.example .env
 docker compose pull   # grab prebuilt images (amd64 + arm64) — skip to build from source instead
 docker compose up -d
@@ -125,8 +121,8 @@ no backend — everything stays on the phone, with native workout-day reminders 
 backups. Self-hosting gets you multi-device sync and profiles for friends & family; the
 mobile app is the install-and-done flavor.
 
-- **Android:** [**download the APK**](https://opengym.duarte-santos.ch) and sideload it —
-  openGym is deliberately not on the Play Store. Or build it yourself: **[docs/MOBILE.md](docs/MOBILE.md)**.
+- **Android:** build the APK from this repo and sideload it — **[docs/MOBILE.md](docs/MOBILE.md)**.
+  There is no prebuilt openGym Longevity download, and it is deliberately not on the Play Store.
 - **iPhone:** Apple doesn't allow installing apps outside the App Store, so there is no iOS
   download. Self-host and add it to your home screen from Safari (it's a full PWA), or build
   the native app onto your own device from Xcode — see **[docs/MOBILE.md](docs/MOBILE.md)**.
@@ -183,7 +179,7 @@ walkthroughs for [Claude](Claude-setup-instructions.md) and [ChatGPT/Codex](Chat
 
 Rough, community-driven — ideas and PRs welcome:
 
-- [x] Standalone mobile app — Android APK to sideload ([download](https://opengym.duarte-santos.ch)); on iOS as a self-hosted PWA (no store listings planned)
+- [x] Standalone mobile app — an Android APK you build and sideload (**[docs/MOBILE.md](docs/MOBILE.md)**); on iOS as a self-hosted PWA (no store listings planned)
 - [x] Automatic progression programs (linear, Greyskull LP, double progression) with stalls and deloads
 - [x] Estimated 1RM per exercise
 - [ ] Percentage / training-max programming (5/3/1-style) on top of the progression engine
@@ -209,26 +205,38 @@ React, the router and Zustand.
 
 ## Community
 
+Anything specific to this version — Progress, the cardio field tests, the representative-lift
+picker — belongs here:
+
+- **[Issues](https://github.com/shinyamadasan/LongevityWork/issues)** — bugs and work on
+  openGym Longevity.
+
+### Upstream openGym community
+
+The wider project this is built on. Please don't report openGym Longevity bugs in these — they
+are upstream's, and the maintainers there can't act on features that only exist in this fork.
+
 - **[Q&A](https://github.com/DuarteSantos8/openGym/discussions/categories/q-a)** — self-hosting
   help, passkey/login trouble, "how do I…". Most login problems turn out to be an `RP_ID`/`ORIGIN`
-  mismatch.
+  mismatch, and that advice applies here unchanged.
 - **[Ideas](https://github.com/DuarteSantos8/openGym/discussions/categories/ideas)** — features
   worth talking through before anyone writes code.
 - **[Show and tell](https://github.com/DuarteSantos8/openGym/discussions/categories/show-and-tell)**
   — your setup, your plan templates, whatever you built on top.
-- **[Issues](https://github.com/DuarteSantos8/openGym/issues)** — bugs, and work that's already
-  been agreed on.
 
 ## Contributing
 
 Issues and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues: more starter
-plans, exercise-data languages, import from other trackers. **A ⭐ helps more people find it.**
+plans, exercise-data languages, import from other trackers.
 
-openGym is free and stays free: AGPL, no subscription, no paid tier, nothing held back for
-sponsors. If it replaced a paid tracker for you and you want to chip in, the Sponsor button at the
-top of the page is there — a star, a bug report or a PR is worth just as much.
+openGym Longevity is free and stays free: AGPL, no subscription, no paid tier, nothing held
+back. Most of this app is upstream's work — if you want to support the project it is built on,
+[DuarteSantos8/openGym](https://github.com/DuarteSantos8/openGym) is the place to do it.
 
 ## License
+
+openGym Longevity is derived from [openGym](https://github.com/DuarteSantos8/openGym) by the
+openGym contributors, and is distributed under the same license.
 
 [GNU AGPL v3.0](LICENSE) — free and open source. You can self-host, use, modify and share it;
 if you run a modified version as a network service, you must offer that version's source under
