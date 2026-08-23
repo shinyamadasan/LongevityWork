@@ -153,3 +153,20 @@ export function latestPair(S, kind) {
 /** Whole days since an ISO date. Local noon, never UTC midnight. */
 export const daysSince = (iso, now = Date.now()) =>
   Math.floor((now - new Date(iso + 'T12:00:00').getTime()) / 86400000)
+
+/**
+ * One result as it should read on screen.
+ *
+ * Metres become kilometres once there are enough of them: "2.21 km" is a distance a runner
+ * recognises, while "2,210 m" is a number they have to convert first. Storage is untouched —
+ * this is presentation only, and `latestPair` still compares in metres.
+ *
+ * Deltas deliberately do not come through here. A 160 m improvement is legible as metres and
+ * would read as "0.16 km", which looks like nothing at all.
+ */
+export function displayResult(kind, value) {
+  const test = TESTS[kind]
+  if (!test || !Number.isFinite(value)) return null
+  if (test.field === 'metres' && Math.abs(value) >= 1000) return { value: value / 1000, unit: 'km', digits: 2 }
+  return { value, unit: test.unit, digits: test.decimal ? 1 : 0 }
+}

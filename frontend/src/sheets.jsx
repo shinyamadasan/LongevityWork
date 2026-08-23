@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useStore } from './store/useStore.js'
 import { useUI } from './store/useUI.js'
 import { EXDB, EXIDX, BODYPARTS, isCardio, allExercises, equipmentOf } from './lib/exercises.js'
-import { fmtDate, fmtNum, fmtVol, fmtDur, durPart, todayISO, uid, exCount, DAYN, MONTHS_LONG, ACCENTS } from './lib/format.js'
+import { fmtDate, fmtNum, fmtFixed, fmtVol, fmtDur, durPart, todayISO, uid, exCount, DAYN, MONTHS_LONG, ACCENTS } from './lib/format.js'
 import { lastEntryFor, bestWeightFor, buildSets, effectiveRoutineId, workoutVolume, setsDone, setsDoneActive, lastBW, supersetUnits, unitOf, setLabel, defaultConfig, cleanupSg, modeOf, effortOf } from './lib/history.js'
 import { beep, vibrate } from './lib/sound.js'
 import { t, instrFor, getLang, INSTR_LANGS } from './lib/i18n.js'
@@ -19,7 +19,7 @@ import { parseImport, mergeImport } from './lib/import-csv.js'
 import { buildPlanBundle, parsePlan, mergePlan, printPlan } from './lib/plan-share.js'
 import { estimate1RM, best1RM, is1RMRecord, REP_CAP } from './lib/onerm.js'
 import { nextPrescription, applyPrescription, policyFor, defaultIncrement, POLICIES_FOR, POLICY_NAME, POLICY_DESC } from './lib/progression.js'
-import { TESTS, PRIMARY_KIND, estimateVO2 } from './lib/cardio.js'
+import { TESTS, PRIMARY_KIND, estimateVO2, displayResult } from './lib/cardio.js'
 import { candidates, repFor } from './lib/strength.js'
 import { MOBILE, shareExport } from './lib/mobile.js'
 
@@ -967,6 +967,7 @@ function FieldTest({ close }) {
   const n = Number(v)
   const ok = Number.isFinite(n) && n > 0
   const vo2 = ok ? estimateVO2(kind, { [test.field]: n }, { body: st.body }) : null
+  const shown = ok ? displayResult(kind, n) : null
 
   return <>
     <h3>{t('Log a fitness test')}</h3>
@@ -982,7 +983,10 @@ function FieldTest({ close }) {
 
     <div style={{ height: 14 }} />
     {ok && <div className="card" style={{ margin: 0, textAlign: 'center' }}>
-      <div className="big">{fmtNum(n)} <span className="dim" style={{ fontSize: 17, fontWeight: 400 }}>{test.unit}</span></div>
+      {/* Echoed the way Progress will show it — for a Cooper run that means kilometres,
+          which is also the fastest way to notice you typed 2.21 into a field asking for
+          metres. */}
+      <div className="big">{fmtFixed(shown.value, shown.digits)} <span className="dim" style={{ fontSize: 17, fontWeight: 400 }}>{shown.unit}</span></div>
       <div className="small dim" style={{ marginTop: 4 }}>{t(test.name)}</div>
       {vo2
         ? <div className="small dim" style={{ marginTop: 8 }}>{t('Estimated VO₂max {0}', vo2)}</div>
@@ -996,7 +1000,7 @@ function FieldTest({ close }) {
         s.cardioTests = [...(s.cardioTests || []), { d: todayISO(), kind, values: { [test.field]: n }, vo2 }]
       })
       close()
-      toast(t('Test logged: {0} {1}', fmtNum(n), test.unit))
+      toast(t('Test logged: {0} {1}', fmtFixed(shown.value, shown.digits), shown.unit))
     }}>{t('Save result')}</Button>
   </>
 }

@@ -224,3 +224,49 @@ describe('areaProgress', () => {
     expect(areaProgress(state(), opts)).toEqual([])
   })
 })
+
+// Which lift represents an area is profile state, not a device preference: it decides how
+// your training reads, so it has to be the same answer on a phone as on a laptop. It rides
+// the ordinary state sync (pushState PUTs the whole S; pullState shallow-merges the reply
+// over DEF), which needs two things to hold.
+describe('cross-device sync', () => {
+  const DEF_LIKE = { workouts: [], bodyweight: [], strengthReps: {}, cardioTests: [] }
+  // Exactly what pullState does with the server's reply.
+  const merge = server => Object.assign(structuredClone(DEF_LIKE), server)
+
+  it('carries a pin across the merge, because it is a top-level key', () => {
+    // Nested under one namespace it would be replaced wholesale by whichever side wrote
+    // last, rather than defaulting cleanly.
+    const S = merge({ strengthReps: { 'upper legs': SQUAT }, workouts: [] })
+    expect(S.strengthReps).toEqual({ 'upper legs': SQUAT })
+  })
+
+  it('gives a profile that predates the feature an empty map, not undefined', () => {
+    const S = merge({ workouts: [], bodyweight: [] })
+    expect(S.strengthReps).toEqual({})
+    // And it must still derive rather than crash on the missing key.
+    expect(() => repFor(S, 'upper legs')).not.toThrow()
+  })
+
+  it('never overwrites a pin that arrived from another device', () => {
+    // The screen derives missing pins on mount. If that could overwrite, device B would
+    // fight device A every time their training histories differed.
+    const S = state({
+      strengthReps: { 'upper legs': SQUAT },
+      workouts: [
+        workout(30, [[LEGPRESS, 200, 5]]), workout(23, [[LEGPRESS, 200, 5]]),
+        workout(16, [[LEGPRESS, 200, 5]]), workout(9, [[SQUAT, 100, 5]])
+      ]
+    })
+    expect(missingReps(S)['upper legs']).toBeUndefined()
+    expect(repFor(S, 'upper legs').id).toBe(SQUAT)
+  })
+
+  it('fills only the areas the other device had nothing to say about', () => {
+    const S = state({
+      strengthReps: { 'upper legs': SQUAT },
+      workouts: [workout(9, [[SQUAT, 100, 5]]), workout(8, [[BENCH, 80, 5]])]
+    })
+    expect(missingReps(S)).toEqual({ chest: BENCH })
+  })
+})

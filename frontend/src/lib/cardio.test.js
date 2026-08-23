@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { TESTS, estimateVO2, latestPair, primaryKind, cardioTests, daysSince } from './cardio.js'
+import { TESTS, estimateVO2, latestPair, primaryKind, cardioTests, daysSince, displayResult } from './cardio.js'
 
 const test = (d, kind, values, vo2 = null) => ({ d, kind, values, vo2 })
 const state = tests => ({ body: 'male', cardioTests: tests })
@@ -135,5 +135,35 @@ describe('daysSince', () => {
   it('measures from local noon', () => {
     const now = new Date('2026-06-01T09:00:00').getTime()
     expect(daysSince('2026-05-25', now)).toBe(6)
+  })
+})
+
+describe('displayResult', () => {
+  it('shows a Cooper run in kilometres, to two decimals', () => {
+    // fmtNum's single decimal would render 2.21 and 2.15 identically as "2.2".
+    expect(displayResult('cooper', 2210)).toEqual({ value: 2.21, unit: 'km', digits: 2 })
+    expect(displayResult('cooper', 2050)).toEqual({ value: 2.05, unit: 'km', digits: 2 })
+  })
+
+  it('keeps a short distance in metres', () => {
+    expect(displayResult('cooper', 350)).toEqual({ value: 350, unit: 'm', digits: 0 })
+  })
+
+  it('leaves times and heart rates alone', () => {
+    expect(displayResult('run24', 11.4)).toEqual({ value: 11.4, unit: 'min', digits: 1 })
+    expect(displayResult('step', 140)).toEqual({ value: 140, unit: 'bpm', digits: 0 })
+  })
+
+  it('does not touch what latestPair compares', () => {
+    // Presentation only: storage stays in metres and so does the delta, where 160 m is a
+    // visible gain and "0.16 km" would read as nothing.
+    const S = { cardioTests: [
+      { d: '2026-02-12', kind: 'cooper', values: { metres: 2050 }, vo2: 34.5 },
+      { d: '2026-05-01', kind: 'cooper', values: { metres: 2210 }, vo2: 38.1 }
+    ] }
+    const p = latestPair(S, 'cooper')
+    expect(p.current).toBe(2210)
+    expect(p.delta).toBe(160)
+    expect(p.unit).toBe('m')
   })
 })

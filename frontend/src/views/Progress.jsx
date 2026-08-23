@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { useStore } from '../store/useStore.js'
 import { t } from '../lib/i18n.js'
-import { fmtNum, fmtDate } from '../lib/format.js'
+import { fmtNum, fmtFixed, fmtDate } from '../lib/format.js'
 import { thisWeek, lastNWeeks } from '../lib/consistency.js'
 import { areaProgress, missingReps } from '../lib/strength.js'
-import { latestPair, primaryKind, daysSince } from '../lib/cardio.js'
+import { latestPair, primaryKind, daysSince, displayResult } from '../lib/cardio.js'
 import { fieldTestSheet, strengthRepSheet } from '../sheets.jsx'
 import { Button } from '../components/ui.jsx'
 import { nav } from '../lib/nav.js'
@@ -125,17 +125,21 @@ function Cardio({ S }) {
   }
 
   const stale = daysSince(pair.currentDate)
+  // A Cooper run reads as "2.21 km", not "2,210 m" — but the delta below stays in metres,
+  // where 160 m is a visible gain and "0.16 km" would look like nothing.
+  const cur = displayResult(pair.kind, pair.current)
+  const prev = pair.previous === null ? null : displayResult(pair.kind, pair.previous)
   return <div className="card">
     <h2>{t('Cardio')}</h2>
     <div className="small dim">{t(pair.name)}</div>
     <div className="row between" style={{ alignItems: 'baseline', gap: 10, marginTop: 2 }}>
-      <span className="big">{fmtNum(pair.current)} <span className="dim" style={{ fontSize: 17, fontWeight: 400 }}>{pair.unit}</span></span>
+      <span className="big">{fmtFixed(cur.value, cur.digits)} <span className="dim" style={{ fontSize: 17, fontWeight: 400 }}>{cur.unit}</span></span>
       {/* Same kind only, always — a Cooper run and a step test are different instruments,
           and a "change" between them is noise with a unit attached. */}
       {pair.previous !== null && <Delta value={pair.delta} unit={pair.unit} improved={pair.improved} />}
     </div>
     {pair.previous !== null && <div className="small dim" style={{ marginTop: 6 }}>
-      {t('Previous {0} {1} · {2}', fmtNum(pair.previous), pair.unit, fmtDate(pair.previousDate))}
+      {t('Previous {0} {1} · {2}', fmtFixed(prev.value, prev.digits), prev.unit, fmtDate(pair.previousDate))}
     </div>}
     {pair.vo2 && <div className="small dim" style={{ marginTop: 3 }}>{t('Estimated VO₂max {0}', pair.vo2)}</div>}
     <div className="small dim" style={{ marginTop: 3, color: stale > 180 ? 'var(--label-2)' : undefined }}>
@@ -152,12 +156,20 @@ export default function Progress() {
   const update = useStore(s => s.update)
 
   // Pin each area's representative lift the first time it can be derived, so the headline
-  // never silently swaps to a different exercise when training patterns shift. Persisted
-  // locally but not pushed: it is a pure function of history, so any other device derives
-  // the same answer on its own, and opening a screen should not cost a sync.
+  // never silently swaps to a different exercise when training patterns shift.
+  //
+  // Synced like any other profile state, because it is profile state: which lift represents
+  // an area is a decision about how your training reads, and it has to be the same decision
+  // on your phone as on your laptop. `update` pushes by default, so this rides the ordinary
+  // debounced sync rather than needing anything of its own.
+  //
+  // Safe to run on every mount: missingReps only fills areas with no stored pin, so a choice
+  // that arrived from the server is never overwritten by a fresh derivation. boot() pulls
+  // before any screen mounts, so the server's answer is already in place by the time this
+  // runs, and once every area is pinned it produces nothing and writes nothing.
   useEffect(() => {
     const add = missingReps(S)
-    if (Object.keys(add).length) update(s => { s.strengthReps = { ...(s.strengthReps || {}), ...add } }, false)
+    if (Object.keys(add).length) update(s => { s.strengthReps = { ...(s.strengthReps || {}), ...add } })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [S.workouts.length])
 
