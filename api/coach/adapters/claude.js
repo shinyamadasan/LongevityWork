@@ -5,7 +5,6 @@
  * through the child environment, and keeps the model in a text-in / JSON-out lane: no tools,
  * no settings files, no MCP servers, and no persisted session history. */
 import { spawn } from 'node:child_process';
-import { query } from '@anthropic-ai/claude-agent-sdk';
 import { unprivilegedIds } from './spawn.js';
 
 const SDK_VERSION = 'Claude Agent SDK 0.3.220';
@@ -28,8 +27,9 @@ export default {
   runtime: 'Claude Agent SDK',
 
   async check() {
-    // Importing this module verifies the SDK package at boot/build time. The real round-trip in
-    // testRun() then verifies its bundled native runtime and the owner credential together.
+    // The SDK package itself is verified at image-build time — api/Dockerfile imports it as a
+    // build step and fails the build if it is missing. The real round-trip in testRun() then
+    // verifies its bundled native runtime and the owner credential together.
     return { ok: true, version: SDK_VERSION };
   },
 
@@ -45,6 +45,12 @@ export default {
     }, timeoutMs);
 
     try {
+      // Loaded here rather than at module scope. This adapter is one of three in the barrel, so a
+      // static import made *importing the adapters at all* — which jobs.js, routes.js and the
+      // frontend's coach test all do — require an optional provider SDK that CI has no reason to
+      // install: its Coach tests drive the in-repo fixture provider precisely so the graph loads
+      // without an AI account or a network. Only a run that reaches this line needs the package.
+      const { query } = await import('@anthropic-ai/claude-agent-sdk');
       for await (const message of query({
         prompt,
         options: {
