@@ -2,6 +2,59 @@
 
 ## Unreleased
 
+### Progress — consistency, strength & cardio
+
+openGym has always been able to tell you what you did. What it could not tell you is whether
+it is working. The heatmap shows squares, the charts show lines, and answering "am I actually
+getting anywhere" meant reading five screens and doing the comparison in your head.
+
+Progress is one screen that answers three questions and refuses to answer anything else: am I
+training consistently, am I getting stronger, is my cardio improving. Every number on it is you
+against your own past — no population bands, no percentiles, no score. It is reached from the
+medal button in the Stats header. **[The full design and reasoning →](docs/PROGRESS.md)**
+
+- 📅 **Consistency that cannot flatter you.** Training *days*, not sessions, because two sessions
+  on one Saturday is one day of training — and a workout you finished with nothing checked off
+  is not training at all. This week reads as two independent facts, "3 training days · 3
+  planned", never as a fraction: those count different sets, so "3 of 3" could describe a week
+  in which you missed a planned session, and a fourth day would read "4 of 3".
+- 📊 **Eight weeks that editing your plan cannot rewrite.** "2.6 days/week · trained in 7 of 8",
+  deliberately with no target attached. Your weekly plan has no history, so scoring the past
+  against today's plan would let switching from three days to five retroactively re-score every
+  week behind you. No day streaks and no loss language either — a missed week lowers an average
+  and resets nothing.
+- 💪 **A strength number that can go down.** One representative lift per body area against your
+  own best from about three months ago. That constraint decided the metric: the stored
+  per-exercise max only ever rises, so it can answer "am I stronger?" with nothing but yes.
+  This is an estimated 1RM computed on *total* load, and both ends of the comparison are best-in-
+  a-30-day-window, so a plateau shows as a plateau but one deload session cannot move it.
+- 🤸 **Bodyweight training finally counts.** A pull-up is logged at zero added weight, and every
+  1RM formula correctly refuses a zero — so bodyweight work used to produce no number anywhere.
+  Computing total load first fixes it, and fixes weighted pull-ups too: an 80 kg lifter at
+  +20 kg × 5 is 116.7 kg, not the 103.3 you get by estimating the plate and adding yourself
+  afterwards. Assisted variants are excluded outright, because there the logged weight is
+  *assistance* — counting it would rate you stronger than going unassisted, and the number would
+  fall as you needed less help.
+- 🎯 **The lift that speaks for an area stays put.** Picked by how often you actually train it —
+  not by what moves the most weight, which just picks the leg press — and only from lifts that
+  can produce an estimate. Then it is pinned and synced to your profile, so the headline never
+  silently swaps to a different exercise and starts calling that progress. The exercise name is
+  always on screen, and tapping the row lets you change it yourself.
+- 🏃 **Cardio you can repeat.** The Cooper 12-minute run, with the **distance** as the answer —
+  2.21 km against your previous 2.05 km, ↑ 160 m. VO₂max is a secondary line, and it never gates
+  anything: a short result that falls outside the formula's range is still logged, because a
+  distance is a distance whether or not a regression likes it. Comparisons only ever run within
+  one test, since a run and a step test are different instruments, and each test knows which way
+  is better — so a *faster* 2.4 km reads as an improvement, not a decline.
+- 🙈 **Nothing invented to fill a gap.** A body area with no honest number is absent rather than
+  blank, so a barbell trainee sees four or five rows instead of eight mostly-empty ones. Empty
+  states say what they need and offer the one action that produces it — no zeros, no empty
+  charts.
+
+Stats keeps everything it had; Home still answers "what do I do now". Nothing else changed:
+your plan, workouts, progression rules and estimated 1RMs are untouched, and an old backup
+imports with no migration step.
+
 ### The AI Coach
 
 openGym could always progress a plan. It could never *write* one, and it never looked at the

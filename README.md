@@ -67,7 +67,7 @@ and laptop.
 
 ## Features
 
-- 📊 **Progress — consistency, strength & cardio** — the screen this version exists for. Training days this week against what you planned, and an 8-week rate that editing your plan can't rewrite. One representative lift per body area, compared against your own best from about three months ago — it can go **down**, which is the point. Cooper 12-minute run distance against your previous test. Every number is you-versus-you: no population bands, no percentiles, no score.
+- 📊 **Progress — consistency, strength & cardio** — the screen this version exists for. Training days this week against what you planned, and an 8-week rate that editing your plan can't rewrite. One representative lift per body area, compared against your own best from about three months ago — it can go **down**, which is the point. Cooper 12-minute run distance against your previous test. Every number is you-versus-you: no population bands, no percentiles, no score. **[Design and reasoning →](docs/PROGRESS.md)**
 - ⚖️ **Body-weight tracking** — interactive chart with a goal line you set, gains/losses colored by whether they move toward it
 - 🏋️ **Weekly plan** — a routine per weekday, over a library of **1,324 exercises** (searchable, with animated demos)
 - 🗓️ **Reschedule any day** — sick, missed a session, or fewer gym days this week? Move a workout to another day without touching your weekly plan
