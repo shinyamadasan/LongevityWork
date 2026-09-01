@@ -1,0 +1,40 @@
+{
+  "contractVersion": "WORKOUT_LEDGER_SOURCE_CONTRACT_V1",
+  "capturedAt": "2026-09-01T19:23:44.529Z",
+  "capturedFrom": "real parseWorkoutCSV() execution (workout-ledger-source-contract.test.js)",
+  "sourceCsv": "Date,Workout Name,Duration,Exercise Name,Set Order,Weight,Reps,Distance,Seconds,Notes,Workout Notes,RPE\n2026-08-15 07:30,Push Day,45m,Barbell Bench Press,1,60,8,,,,,\n2026-08-15 07:30,Push Day,45m,Barbell Bench Press,2,60,7,,,,,8\n2026-08-15 07:30,Push Day,45m,Barbell Bench Press,3,60,6,,,,,",
+  "workout": {
+    "id": "iwmtj22cy86lgzz",
+    "d": "2026-08-15",
+    "start": 1786804200000,
+    "end": 1786804200000,
+    "routineId": null,
+    "name": "Push Day",
+    "entries": [
+      {
+        "id": "0025",
+        "sets": [
+          {
+            "w": 60,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 7,
+            "done": true,
+            "rpe": 8
+          },
+          {
+            "w": 60,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "topW": 60
+      }
+    ],
+    "prs": [],
+    "vol": 1260
+  }
+}
