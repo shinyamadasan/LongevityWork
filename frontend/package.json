@@ -29,6 +29,8 @@
     "@capacitor/cli": "^7.6.8",
     "@capacitor/ios": "^7.6.8",
     "@vitejs/plugin-react": "^6.0.3",
+    "acorn": "^8.17.0",
+    "acorn-walk": "^8.3.5",
     "vite": "^8.1.5",
     "vitest": "^4.1.10"
   }
